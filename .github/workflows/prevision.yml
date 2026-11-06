@@ -1,0 +1,101 @@
+name: Prévision surf
+
+on:
+  schedule:
+    - cron: "7 * * * *"        # toutes les heures (Candhis + Open-Meteo), Copernicus toutes les 3 h
+  workflow_dispatch:
+    inputs:
+      copernicus:
+        description: "Forcer l'extraction Copernicus"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: prevision-surf
+  cancel-in-progress: false
+
+jobs:
+  prevision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: collector/requirements.txt
+      - run: pip install -r collector/requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # copernicus.json n'est pas versionné : on garde le dernier dans le cache entre deux exécutions
+      - name: Restaurer le dernier extrait Copernicus
+        uses: actions/cache/restore@v4
+        with:
+          path: data/copernicus.json
+          key: copernicus-${{ github.run_id }}
+          restore-keys: copernicus-
+
+      - name: Copernicus Med-WAV
+        id: cop
+        env:
+          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
+          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+          FORCE: ${{ github.event.inputs.copernicus }}
+        run: |
+          H=$(date -u +%H)
+          if [ "$FORCE" = "true" ] || [ $((10#$H % 3)) -eq 0 ] || [ ! -f data/copernicus.json ]; then
+            python collector/copernicus.py || echo "::warning::Copernicus indisponible, prévision calculée sans lui"
+          else
+            echo "Copernicus : pas d'extraction à cette heure (dernier extrait réutilisé)"
+          fi
+
+      - name: Sauver l'extrait Copernicus
+        if: hashFiles('data/copernicus.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: data/copernicus.json
+          key: copernicus-${{ github.run_id }}
+
+      - name: Bouées Candhis
+        run: python collector/candhis.py || echo "::warning::Candhis indisponible"
+
+      - name: Tests du moteur
+        run: node --test tests/engine.test.js
+
+      - name: Calcul de la prévision
+        run: node collector/build.js
+
+      - name: Versionner l'historique (bouées + archive de prévisions)
+        run: |
+          git config user.name "prevision-bot"
+          git config user.email "prevision-bot@users.noreply.github.com"
+          git add data/history
+          git diff --cached --quiet || git commit -m "données : $(date -u +%Y-%m-%dT%H:%MZ)" -q
+          git push -q || echo "::warning::push impossible (exécution concurrente ?)"
+
+      - name: Assembler le site
+        run: |
+          mkdir -p _site/data
+          cp -r web/* _site/
+          cp engine/surf-engine.js engine/spots.json _site/
+          cp data/forecast.json _site/data/
+          cp widget/super-previ-surf-widget.js _site/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4
