@@ -1,0 +1,11 @@
+node_modules/
+__pycache__/
+.pytest_cache/
+_site/
+# produits à chaque exécution, publiés sur GitHub Pages mais pas versionnés
+data/forecast.json
+data/copernicus.json
+# jamais d'identifiants dans le dépôt
+.env
+*.credentials
+.copernicusmarine/

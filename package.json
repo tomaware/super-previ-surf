@@ -1,0 +1,15 @@
+{
+  "name": "super-previ-surf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prévision surf multi-modèles pour les spots du Golfe du Lion",
+  "scripts": {
+    "test": "node --test tests/*.test.js && python3 -m pytest -q tests/",
+    "build": "node collector/build.js",
+    "standalone": "node tools/build-standalone.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0",
+    "terser": "^5.0.0"
+  }
+}
