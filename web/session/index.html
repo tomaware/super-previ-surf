@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Session 2 h</title>
+<meta name="description" content="Le meilleur créneau de 2 h pour aller surfer à Palavas ou Carnon, dans tes horaires.">
+<meta name="theme-color" content="#0c1d26">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Session 2h">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230c1d26'/%3E%3Ccircle cx='32' cy='32' r='19' fill='none' stroke='%23ffd23f' stroke-width='5'/%3E%3Cpath d='M32 18v14l9 6' stroke='%23ffd23f' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Mise en page : une réponse en grand (le créneau), puis la semaine en frises horaires, puis les réglages. */
+:root{
+  --bg:#edf2f3; --surface:#ffffff; --sunk:#e1e8ea; --ink:#0c1d26; --ink-2:#47606b; --ink-3:#7d929b; --line:#cfdadd;
+  --hi:#ffd23f; --hi-ink:#2b2100; --go:#0e9f8a; --bof:#c98a12; --non:#b6463a;
+  --s0:#b9c4c8; --s1:#e3b04b; --s2:#d9cc3f; --s3:#4fb36a; --s4:#119e93; --s5:#6a4ef0;
+  --off:#0e9f8a; --side:#c9a227; --on:#c4553b;
+  --display:"Familjen Grotesk","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1d26; --surface:#122833; --sunk:#0f222c; --ink:#e9f1f3; --ink-2:#a3b7bf; --ink-3:#6c8692; --line:#1f3b48;
+  --hi:#ffd23f; --hi-ink:#2b2100; --go:#3fd3bb; --bof:#e6b04a; --non:#e2735f;
+  --s0:#3e5560; --s1:#d29a3a; --s2:#d8c443; --s3:#56c271; --s4:#37d0c0; --s5:#9b82ff;
+  --off:#3fd3bb; --side:#d8b43a; --on:#e2694c; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0c1d26; --surface:#122833; --sunk:#0f222c; --ink:#e9f1f3; --ink-2:#a3b7bf; --ink-3:#6c8692; --line:#1f3b48;
+  --hi:#ffd23f; --hi-ink:#2b2100; --go:#3fd3bb; --bof:#e6b04a; --non:#e2735f;
+  --s0:#3e5560; --s1:#d29a3a; --s2:#d8c443; --s3:#56c271; --s4:#37d0c0; --s5:#9b82ff;
+  --off:#3fd3bb; --side:#d8b43a; --on:#e2694c; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em}
+.logo svg{width:30px;height:30px}
+.spots{display:flex;gap:6px}
+.spot-chip{font:600 12px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:5px 10px;cursor:pointer}
+.spot-chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.spot-chip:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
+
+/* la réponse */
+.answer{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px 20px 20px;position:relative;overflow:hidden}
+.verdict{display:inline-flex;align-items:center;gap:8px;font:700 12px var(--body);text-transform:uppercase;letter-spacing:.1em;padding:5px 10px;border-radius:999px;background:var(--sunk)}
+.verdict i{width:9px;height:9px;border-radius:50%;background:currentColor}
+.verdict.go{color:var(--go)}.verdict.bof{color:var(--bof)}.verdict.non{color:var(--non)}
+.when{font-family:var(--display);font-weight:700;font-size:clamp(34px,9vw,54px);line-height:1.02;letter-spacing:-.03em;margin:14px 0 4px;text-wrap:balance}
+.when .time{display:inline-block;background:var(--hi);color:var(--hi-ink);border-radius:10px;padding:0 .18em;margin-top:4px}
+.where{font-size:17px;color:var(--ink-2);margin:10px 0 0}
+.where b{color:var(--ink)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:18px}
+.fact{background:var(--sunk);border-radius:12px;padding:9px 10px;min-width:0}
+.fact b{display:block;font:700 18px var(--mono);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fact span{font-size:11px;color:var(--ink-3)}
+.also{margin-top:14px;font-size:14px;color:var(--ink-2);line-height:1.5}
+.also b{color:var(--ink)}
+.live{margin-top:12px;font-size:12px;color:var(--ink-3)}
+
+h2{font:600 12px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:30px 0 10px}
+/* frises */
+.week{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:6px 0}
+.day{display:grid;grid-template-columns:92px minmax(0,1fr) 54px;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}
+.day:first-child{border-top:0}
+.dname{font:600 14px var(--body)}
+.dname small{display:block;font-weight:400;color:var(--ink-3);font-size:11px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip svg{display:block;width:100%;height:30px}
+.pill{font:700 14px var(--mono);border-radius:8px;padding:4px 0;text-align:center;color:var(--ink)}
+.axis{display:grid;grid-template-columns:92px minmax(0,1fr) 54px;gap:10px;padding:2px 14px 6px}
+.axis svg{display:block;width:100%;height:14px}
+.axis text{font:10px var(--mono);fill:var(--ink-3)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ink-2);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:10px;border-radius:3px;display:inline-block}
+
+/* réglages */
+details{background:var(--surface);border:1px solid var(--line);border-radius:18px;margin-top:30px}
+summary{cursor:pointer;padding:14px 16px;font:600 14px var(--body);list-style:none;display:flex;justify-content:space-between}
+summary::after{content:"Modifier";color:var(--ink-3);font-weight:400}
+details[open] summary::after{content:"Fermer"}
+.prefs{padding:0 16px 16px;display:grid;gap:12px}
+.prow{display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:6px 10px;font-size:14px}
+@media (max-width:520px){.prow{grid-template-columns:24px minmax(0,1fr)}.prow .times{grid-column:2}}
+.prow input[type=time]{font:500 13px var(--mono);background:var(--sunk);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:5px 6px}
+.prow .times{display:flex;gap:6px;align-items:center;color:var(--ink-3)}
+.prow input[type=checkbox]{width:18px;height:18px;accent-color:var(--go)}
+.sel{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;align-items:center}
+.sel select{font:500 13px var(--body);background:var(--sunk);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+footer{color:var(--ink-3);font-size:12px;line-height:1.6;margin-top:28px}
+footer a{color:var(--ink-2)}
+.err{border:1px solid var(--non);border-radius:14px;padding:14px;background:var(--surface);font-size:14px}
+@media (max-width:520px){
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .day,.axis{grid-template-columns:64px minmax(0,1fr) 46px;gap:8px;padding-left:12px;padding-right:12px}
+  .dname{font-size:13px}
+}
+@media (prefers-reduced-motion:no-preference){.answer{animation:in .35s ease-out both}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="var(--ink)"/><circle cx="32" cy="32" r="19" fill="none" stroke="var(--hi)" stroke-width="5"/><path d="M32 18v14l9 6" stroke="var(--hi)" stroke-width="5" fill="none" stroke-linecap="round"/></svg>Session 2 h</div>
+    <div class="spots" id="spots" role="group" aria-label="Spots"></div>
+  </header>
+
+  <main id="app"><div class="answer"><div class="verdict"><i></i>Calcul…</div><div class="when">Je regarde la semaine</div></div></main>
+
+  <details id="prefs">
+    <summary>Mes créneaux</summary>
+    <div class="prefs" id="prefsBody"></div>
+  </details>
+
+  <footer>
+    Notes issues de <a href="../">Super Prévi Surf</a> : 6 modèles de houle dont Copernicus, vent AROME, recalés sur les bouées de Sète et de l'Espiguette, recalculés toutes les heures. Note de session = 60 % de la moyenne + 40 % du pire moment des 2 h : un créneau régulier passe devant un pic suivi d'un trou. Tes réglages restent sur ce téléphone.
+  </footer>
+</div>
+
+<script src="session-core.js"></script>
+<script>
+(function(){
+'use strict';
+var S = window.SessionCore, TZ = S.TZ;
+var NAMES = { palavas: 'Palavas', carnon: 'Carnon' };
+var prefs = loadPrefs(), forecast = null;
+
+function loadPrefs(){
+  var p = JSON.parse(JSON.stringify(S.DEFAULT_PREFS));
+  try { var s = JSON.parse(localStorage.getItem('session2h-prefs') || 'null'); if (s && s.week) p = Object.assign(p, s); } catch (e) {}
+  return p;
+}
+function savePrefs(){ try { localStorage.setItem('session2h-prefs', JSON.stringify(prefs)); } catch (e) {} }
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function f1(x){ return x == null ? '—' : x.toFixed(1).replace('.', ','); }
+function hm(t){ return new Date(t).toLocaleTimeString('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' }).replace(':00', ' h').replace(':', ' h '); }
+function dayLabel(t, short){
+  var k = S.local(t).key;
+  if (k === S.local(Date.now()).key) return "Aujourd'hui";
+  if (k === S.local(Date.now() + 864e5).key) return 'Demain';
+  var s = new Date(t).toLocaleDateString('fr-FR', { timeZone: TZ, weekday: short ? 'short' : 'long', day: 'numeric' }).replace('.', '');
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function bucket(s){ return s == null ? 0 : s < 1.5 ? 0 : s < 3 ? 1 : s < 5 ? 2 : s < 7 ? 3 : s < 8.5 ? 4 : 5; }
+function color(s){ return 'var(--s' + bucket(s) + ')'; }
+var COMPASS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+function compass(d){ return d == null ? '—' : COMPASS[Math.round(((d % 360) + 360) % 360 / 22.5) % 16]; }
+function hToStr(h){ var H = Math.floor(h), M = Math.round((h - H) * 60); return (H < 10 ? '0' : '') + H + ':' + (M < 10 ? '0' : '') + M; }
+function strToH(s){ var p = s.split(':'); return +p[0] + (+p[1] || 0) / 60; }
+
+// ---------- données
+function load(){
+  return fetch('../data/forecast.json', { cache: 'no-cache' }).then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(d){ if (!d.spots) throw new Error('prévision vide'); return d; })
+    .catch(function(){ return live(); });
+}
+/** secours : calcul direct depuis Open-Meteo avec le moteur de Super Prévi Surf */
+function live(){
+  return new Promise(function(res, rej){
+    var sc = document.createElement('script'); sc.src = '../surf-engine.js'; sc.onerror = function(){ rej(new Error('moteur introuvable')); };
+    sc.onload = function(){
+      var E = window.SurfEngine;
+      fetch('../spots.json').then(function(r){ return r.json(); }).then(function(SP){
+        var spots = SP.spots.filter(function(s){ return NAMES[s.id]; });
+        var pts = E.queryPoints(spots, []);
+        return Promise.all([fetch(E.openMeteoMarineURL(pts, { pastDays: 1, forecastDays: 8 })).then(function(r){ return r.json(); }),
+          fetch(E.openMeteoWindURL(spots, { pastDays: 2, forecastDays: 8 })).then(function(r){ return r.json(); })]).then(function(a){
+          var marine = E.mergeMarine(E.parseOpenMeteoMarine(a[0], pts.map(function(p){ return p.id; })));
+          var wind = E.parseOpenMeteoWind(a[1], spots.map(function(s){ return s.id; }));
+          var d = E.toForecastJSON(E.run({ spots: spots, buoys: [], marine: marine, wind: wind, now: Date.now(), days: 7 }), {});
+          d._live = true; res(d);
+        });
+      }).catch(rej);
+    };
+    document.head.appendChild(sc);
+  });
+}
+
+// ---------- rendu
+function renderSpots(){
+  document.getElementById('spots').innerHTML = Object.keys(NAMES).map(function(id){
+    return '<button class="spot-chip" type="button" data-id="' + id + '" aria-pressed="' + (prefs.spots.indexOf(id) >= 0) + '">' + NAMES[id] + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('.spot-chip'), function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id'), i = prefs.spots.indexOf(id);
+      if (i >= 0 && prefs.spots.length > 1) prefs.spots.splice(i, 1); else if (i < 0) prefs.spots.push(id);
+      savePrefs(); renderSpots(); render();
+    };
+  });
+}
+
+function render(){
+  if (!forecast) return;
+  var now = Date.now(), P = S.plan(forecast, prefs, now), s = P.next, v = S.verdict(s, prefs);
+  var html = [];
+  html.push('<section class="answer" aria-live="polite">');
+  html.push('<div class="verdict ' + v.code + '"><i></i>' + esc(v.label) + '</div>');
+  if (s) {
+    html.push('<div class="when">' + esc(dayLabel(s.start)) + '<br><span class="time">' + hm(s.start) + ' → ' + hm(s.end) + '</span></div>');
+    html.push('<p class="where">à <b>' + esc(NAMES[s.spot] || s.name) + '</b> · note de session <b>' + f1(s.score) + '/10</b>' + (s.short ? ' · ' + String(s.len).replace('.5', ' h 30').replace(/^(\\d)$/, '$1 h') + ' seulement (jour ou créneau trop court)' : '') + (s.bas ? ' · juste après le coup de mer' : '') + '</p>');
+    html.push('<div class="facts">' +
+      fact(f1(s.hb) + ' m', 'au bord') +
+      fact(f1(s.tp) + ' s', 'houle ' + compass(s.dir)) +
+      fact((s.ws == null ? '—' : Math.round(s.ws)) + ' km/h', 'vent ' + compass(s.wd2) + ' · ' + (s.wk || '—')) +
+      fact(s.conf == null ? '—' : Math.round(s.conf * 100) + ' %', 'confiance') + '</div>');
+    if (P.best && P.best !== s && P.best.score >= s.score + 1) html.push('<p class="also">Si tu peux attendre : <b>' + esc(dayLabel(P.best.start)) + ' ' + hm(P.best.start) + ' → ' + hm(P.best.end) + '</b> à ' + esc(NAMES[P.best.spot]) + ', ' + f1(P.best.score) + '/10.</p>');
+  } else {
+    html.push('<div class="when">Pas cette semaine</div>');
+    if (P.top) html.push('<p class="where">Le moins pire : ' + esc(dayLabel(P.top.start)) + ' ' + hm(P.top.start) + ' à ' + esc(NAMES[P.top.spot]) + ' (' + f1(P.top.score) + '/10, ' + f1(P.top.hb) + ' m). Ou élargis tes créneaux plus bas.</p>');
+    else html.push('<p class="where">Aucun créneau de jour ne rentre dans tes horaires sur les 7 prochains jours.</p>');
+  }
+  var obs = forecast.spots.filter(function(x){ return prefs.spots.indexOf(x.id) >= 0 && x.nowObs; })[0];
+  if (obs) { var b = (forecast.buoys || {})[obs.nowObs.code] || {}; html.push('<div class="live">Mesuré à la bouée ' + esc(b.name || obs.nowObs.code) + ' à ' + hm(obs.nowObs.t) + ' : ' + f1(obs.nowObs.hs) + ' m' + (obs.nowObs.tm ? ', ' + f1(obs.nowObs.tm) + ' s' : '') + '.</div>'); }
+  if (forecast._live) html.push('<div class="live">Calcul direct (sans recalage bouées) : la prévision du site n\'a pas pu être lue.</div>');
+  html.push('</section>');
+
+  html.push('<h2>La semaine, heure par heure</h2><div class="week">');
+  html.push('<div class="axis"><span></span><svg viewBox="0 0 320 14" preserveAspectRatio="none" aria-hidden="true">' + [6, 9, 12, 15, 18, 21].map(function(h){ var x = (h - 6) / 16 * 320; return '<text x="' + x + '" y="11" text-anchor="' + (h === 6 ? 'start' : 'middle') + '">' + h + 'h</text>'; }).join('') + '</svg><span></span></div>');
+  P.days.forEach(function(d){ html.push(dayRow(d, P)); });
+  // jours sans aucun créneau possible
+  if (!P.days.length) html.push('<div class="day"><div class="dname">—</div><div class="strip"></div><div></div></div>');
+  html.push('</div>');
+  html.push('<div class="legend"><span><i style="background:var(--s0)"></i>à oublier</span><span><i style="background:var(--s2)"></i>surfable</span><span><i style="background:var(--s3)"></i>bon</span><span><i style="background:var(--s4)"></i>très bon</span><span><i style="background:var(--s5)"></i>épique</span><span><i style="background:transparent;outline:2px solid var(--hi);outline-offset:-2px"></i>ta meilleure session</span><span>· plus pâle = hors de tes créneaux</span></div>');
+  document.getElementById('app').innerHTML = html.join('');
+}
+function fact(v, l){ return '<div class="fact"><b>' + v + '</b><span>' + l + '</span></div>'; }
+
+/** frise 6 h → 22 h : note max des spots choisis, toutes les 30 min ; plus pâle hors créneaux ; meilleur créneau encadré */
+function dayRow(best, P){
+  var W = 320, H = 30, x = function(h){ return (h - 6) / 16 * W; };
+  var spots = forecast.spots.filter(function(s){ return prefs.spots.indexOf(s.id) >= 0; });
+  var samplers = spots.map(function(sp){ return { f: S.sampler(sp.h.t, sp.h.score), sp: sp }; });
+  var ranges = S.rangesFor(best.wd, prefs);
+  var parts = [];
+  // horloge locale du jour : on parcourt les demi-heures autour de la date
+  var anchor = best.start - best.h * 3600e3; // ≈ minuit local du jour
+  for (var k = 12; k < 44; k++) {
+    var t = anchor + k * 1800e3, lo = S.local(t);
+    if (lo.key !== best.day || lo.h < 6 || lo.h >= 22) continue;
+    var sc = null, isDay = false;
+    samplers.forEach(function(o){ var v = o.f(t); if (v != null && (sc == null || v > sc)) sc = v; });
+    isDay = S.sunElev(t, spots[0].lat || 43.53, spots[0].lon || 3.95) > S.DAYLIGHT;
+    var inR = ranges.some(function(r){ return lo.h >= r[0] - 1e-9 && lo.h < r[1] - 1e-9; });
+    var fill = !isDay ? 'var(--sunk)' : sc == null ? 'var(--sunk)' : color(sc);
+    parts.push('<rect x="' + x(lo.h).toFixed(1) + '" y="4" width="' + (W / 32 - 1).toFixed(1) + '" height="' + (H - 8) + '" rx="2" fill="' + fill + '" opacity="' + (inR ? 1 : 0.32) + '"><title>' + esc(hToStr(lo.h) + ' — ' + (sc == null ? 'pas de donnée' : f1(sc) + '/10')) + '</title></rect>');
+  }
+  var bx = x(best.h), bw = x(best.h + (best.len || prefs.len)) - bx;
+  parts.push('<rect x="' + (bx - 1).toFixed(1) + '" y="1.5" width="' + (bw + 1).toFixed(1) + '" height="' + (H - 3) + '" rx="4" fill="none" stroke="var(--hi)" stroke-width="2.5"/>');
+  var good = best.score >= prefs.min;
+  return '<div class="day"><div class="dname">' + esc(dayLabel(best.start, true)) + '<small>' + (good ? hm(best.start).replace(/\s/g, '') + ' ' + esc(NAMES[best.spot]) : 'rien') + '</small></div>' +
+    '<div class="strip"><svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="' + esc(dayLabel(best.start) + ', meilleure session ' + hm(best.start) + ' à ' + NAMES[best.spot] + ', ' + f1(best.score) + ' sur 10') + '">' + parts.join('') + '</svg></div>' +
+    '<div class="pill" style="background:' + color(best.score) + ';' + (bucket(best.score) === 0 ? '' : 'color:#0c1d26') + '">' + f1(best.score) + '</div></div>';
+}
+
+// ---------- réglages
+function renderPrefs(){
+  var h = [];
+  prefs.week.forEach(function(r, i){
+    h.push('<label class="prow"><input type="checkbox" id="w' + i + '"' + (r.on ? ' checked' : '') + '><span>' + esc(r.label) + ' <small style="color:var(--ink-3)">lun → ven</small></span><span class="times"><input type="time" id="wf' + i + '" value="' + hToStr(r.from) + '" step="1800">→<input type="time" id="wt' + i + '" value="' + hToStr(r.to) + '" step="1800"></span></label>');
+  });
+  h.push('<label class="prow"><input type="checkbox" id="we"' + (prefs.weekend.on ? ' checked' : '') + '><span>Week-end</span><span class="times"><input type="time" id="wef" value="' + hToStr(prefs.weekend.from) + '" step="1800">→<input type="time" id="wet" value="' + hToStr(prefs.weekend.to) + '" step="1800"></span></label>');
+  h.push('<div class="sel"><label>Durée <select id="len">' + [1, 1.5, 2, 2.5, 3].map(function(v){ return '<option value="' + v + '"' + (v === prefs.len ? ' selected' : '') + '>' + String(v).replace('.5', ' h 30').replace(/^(\d)$/, '$1 h') + '</option>'; }).join('') + '</select></label>' +
+    '<label>Je bouge à partir de <select id="min">' + [[3, '3 (petit)'], [4, '4 (surfable)'], [5, '5'], [6, '6 (bon)']].map(function(v){ return '<option value="' + v[0] + '"' + (v[0] === prefs.min ? ' selected' : '') + '>' + v[1] + '/10</option>'; }).join('') + '</select></label>' +
+    '<button type="button" id="reset" class="spot-chip">Réglages par défaut</button></div>');
+  var body = document.getElementById('prefsBody');
+  body.innerHTML = h.join('');
+  body.onchange = function(){
+    prefs.week.forEach(function(r, i){
+      r.on = document.getElementById('w' + i).checked;
+      r.from = strToH(document.getElementById('wf' + i).value || hToStr(r.from));
+      r.to = strToH(document.getElementById('wt' + i).value || hToStr(r.to));
+    });
+    prefs.weekend.on = document.getElementById('we').checked;
+    prefs.weekend.from = strToH(document.getElementById('wef').value || '07:00');
+    prefs.weekend.to = strToH(document.getElementById('wet').value || '20:00');
+    prefs.len = +document.getElementById('len').value;
+    prefs.min = +document.getElementById('min').value;
+    savePrefs(); render();
+  };
+  document.getElementById('reset').onclick = function(){ try { localStorage.removeItem('session2h-prefs'); } catch (e) {} prefs = loadPrefs(); renderSpots(); renderPrefs(); render(); };
+}
+
+renderSpots(); renderPrefs();
+load().then(function(d){ forecast = d; render(); }).catch(function(e){
+  document.getElementById('app').innerHTML = '<div class="err">Prévision introuvable (' + esc(e.message) + '). Réessaie dans quelques minutes.</div>';
+});
+setInterval(function(){ if (!document.hidden) load().then(function(d){ forecast = d; render(); }).catch(function(){}); }, 30 * 60e3);
+})();
+</script>
+</body>
+</html>
