@@ -28,6 +28,8 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main            # toujours la dernière version, même lors d'une relance
 
       - uses: actions/setup-python@v5
         with:
@@ -83,8 +85,15 @@ jobs:
           git config user.name "prevision-bot"
           git config user.email "prevision-bot@users.noreply.github.com"
           git add data/history
-          git diff --cached --quiet || git commit -m "données : $(date -u +%Y-%m-%dT%H:%MZ)" -q
-          git push -q || echo "::warning::push impossible (exécution concurrente ?)"
+          git diff --cached --quiet && exit 0
+          git commit -m "données : $(date -u +%Y-%m-%dT%H:%MZ)" -q
+          # si main a bougé entre-temps, on se resynchronise (nos fichiers d'historique priment) et on réessaie
+          for i in 1 2 3; do
+            git push -q origin HEAD:main && exit 0
+            git pull -q --rebase -X theirs origin main || { git rebase --abort; git reset -q --soft origin/main; git commit -qm "données : $(date -u +%Y-%m-%dT%H:%MZ)"; }
+            sleep $((i * 5))
+          done
+          echo "::warning::historique non sauvegardé après 3 essais"
 
       - name: Assembler le site
         run: |
