@@ -24,10 +24,16 @@ async function load() {
   const fm = FileManager.local();
   const cache = fm.joinPath(fm.documentsDirectory(), "super-previ-surf.json");
   try {
-    const req = new Request(FORECAST_URL);
-    req.timeoutInterval = 15;
-    const d = await req.loadJSON();
-    if (!d || !d.spots) throw new Error("réponse invalide");
+    if (/TON-COMPTE/.test(FORECAST_URL)) throw new Error("adresse FORECAST_URL non renseignée");
+    // anti-cache : GitHub Pages et iOS gardent parfois une vieille réponse
+    const req = new Request(FORECAST_URL + "?t=" + Math.floor(Date.now() / 600e3));
+    req.timeoutInterval = 20;
+    const txt = await req.loadString();
+    const code = req.response && req.response.statusCode;
+    if (code && code !== 200) throw new Error("le site répond " + code + " pour " + FORECAST_URL);
+    let d;
+    try { d = JSON.parse(txt); } catch (_) { throw new Error("réponse illisible (" + (txt || "").slice(0, 40).replace(/\s+/g, " ") + "…)"); }
+    if (!d || !d.spots) throw new Error("prévision vide");
     fm.writeString(cache, JSON.stringify(d));
     return d;
   } catch (e) {
