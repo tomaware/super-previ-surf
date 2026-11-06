@@ -1,0 +1,84 @@
+{
+  "_doc": "Fiches spots. normal = azimut (°) de la direction vers laquelle la plage fait face (vers le large). Fenêtres de houle en 'd'où ça vient'. size = hauteur au déferlement en m (min = commence à marcher, ideal, max = au-delà ça sature/ferme). confidence: high = fenêtres issues de plusieurs sources concordantes, low = hypothèse à valider par Tom.",
+  "spots": [
+    {
+      "id": "carnon", "name": "Carnon", "commune": "Pérols / Mauguio",
+      "lat": 43.5480, "lon": 3.9850, "normal": 155,
+      "swell": { "min": 110, "max": 225, "ideal": 170 },
+      "size": { "min": 0.4, "ideal": 1.0, "max": 1.6 },
+      "periodMin": 5, "level": "tous niveaux", "shelter": 1.0,
+      "buoys": ["03001", "03404"], "confidence": "medium",
+      "sources": ["Surfnerd: houle SW→SE idéal S, offshore NW, 0,3–1,2 m"]
+    },
+    {
+      "id": "palavas", "name": "Palavas-les-Flots", "commune": "Palavas-les-Flots",
+      "lat": 43.5270, "lon": 3.9300, "normal": 150,
+      "swell": { "min": 105, "max": 215, "ideal": 155 },
+      "size": { "min": 0.4, "ideal": 1.1, "max": 1.8 },
+      "periodMin": 5, "level": "débutant → intermédiaire", "shelter": 1.0,
+      "buoys": ["03404", "03001"], "confidence": "medium",
+      "sources": ["Surfnerd: offshore NW", "fenêtre houle = hypothèse cohérente avec l'orientation"]
+    },
+    {
+      "id": "sete", "name": "Sète (Lazaret / Fontaine)", "commune": "Sète",
+      "lat": 43.3840, "lon": 3.6560, "normal": 145,
+      "swell": { "min": 100, "max": 200, "ideal": 135 },
+      "size": { "min": 0.4, "ideal": 1.1, "max": 1.8 },
+      "periodMin": 5, "level": "tous niveaux", "shelter": 1.0,
+      "buoys": ["03404"], "confidence": "medium",
+      "sources": ["Plages.tv: houle SE, offshore NW, onshore SE"]
+    },
+    {
+      "id": "vias", "name": "La Guillotine", "commune": "Vias",
+      "lat": 43.2900, "lon": 3.4100, "normal": 160,
+      "swell": { "min": 115, "max": 225, "ideal": 160 },
+      "size": { "min": 0.4, "ideal": 1.0, "max": 1.6 },
+      "periodMin": 5, "level": "à valider", "shelter": 1.0,
+      "buoys": ["03404"], "confidence": "low",
+      "sources": ["hypothèse d'orientation — à valider par Tom"]
+    },
+    {
+      "id": "gruissan", "name": "Gruissan", "commune": "Gruissan",
+      "lat": 43.0900, "lon": 3.1200, "normal": 110,
+      "swell": { "min": 75, "max": 185, "ideal": 130 },
+      "size": { "min": 0.4, "ideal": 1.1, "max": 1.8 },
+      "periodMin": 5, "level": "intermédiaire", "shelter": 1.0,
+      "buoys": ["01101", "01102"], "confidence": "medium",
+      "sources": ["Surfnerd: houle E→S idéal SE, offshore W, 0,3–1,5 m"]
+    },
+    {
+      "id": "canet", "name": "Canet Plage", "commune": "Canet-en-Roussillon",
+      "lat": 42.7000, "lon": 3.0400, "normal": 90,
+      "swell": { "min": 45, "max": 170, "ideal": 95 },
+      "size": { "min": 0.4, "ideal": 1.0, "max": 1.6 },
+      "periodMin": 5, "level": "intermédiaire", "shelter": 1.0,
+      "buoys": ["01101"], "confidence": "high",
+      "sources": ["Surfnerd: houle E→S idéal E, offshore W", "Wannasurf: houle SE/E/NE", "Surf-Forecast: meilleur vent W"]
+    },
+    {
+      "id": "paulilles", "name": "Paulilles", "commune": "Port-Vendres",
+      "lat": 42.5000, "lon": 3.1200, "normal": 55,
+      "swell": { "min": 20, "max": 120, "ideal": 70 },
+      "size": { "min": 0.4, "ideal": 1.0, "max": 1.8 },
+      "periodMin": 5, "level": "à valider", "shelter": 0.9,
+      "buoys": ["06601", "01101"], "confidence": "low",
+      "sources": ["hypothèse d'orientation (baie ouverte NE) — à valider par Tom"]
+    },
+    {
+      "id": "perafita", "name": "Platja de Perafita", "commune": "Cervera de la Marenda (ES)",
+      "lat": 42.4300, "lon": 3.1700, "normal": 80,
+      "swell": { "min": 35, "max": 145, "ideal": 85 },
+      "size": { "min": 0.4, "ideal": 1.0, "max": 1.8 },
+      "periodMin": 5, "level": "à valider", "shelter": 0.9,
+      "buoys": ["06601", "01101"], "confidence": "low",
+      "sources": ["hypothèse d'orientation — à valider par Tom"]
+    }
+  ],
+  "buoys": [
+    { "code": "03001", "name": "Espiguette", "lat": 43.4110, "lon": 4.1625, "depth": 32 },
+    { "code": "03404", "name": "Sète", "lat": 43.3713, "lon": 3.7771, "depth": 30 },
+    { "code": "01102", "name": "Port-la-Nouvelle (SEMOP)", "lat": 43.0097, "lon": 3.0861, "depth": 13 },
+    { "code": "01101", "name": "Leucate", "lat": 42.9167, "lon": 3.1250, "depth": 40 },
+    { "code": "06601", "name": "Banyuls", "lat": 42.4895, "lon": 3.1677, "depth": 50 }
+  ]
+}
