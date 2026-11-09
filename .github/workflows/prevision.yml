@@ -72,6 +72,8 @@ jobs:
           key: copernicus-${{ github.run_id }}
 
       - name: Bouées Candhis
+        env:
+          CANDHIS_KEY: ${{ secrets.CANDHIS_KEY }}   # API officielle, en secours du tableau public
         run: python collector/candhis.py || echo "::warning::Candhis indisponible"
 
       - name: Tests du moteur

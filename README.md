@@ -32,6 +32,7 @@ tests/                  29 tests JS + 5 tests Python
 3. Dans le dépôt : **Settings → Secrets and variables → Actions → New repository secret**, crée :
    - `COPERNICUSMARINE_SERVICE_USERNAME` = ton identifiant Copernicus
    - `COPERNICUSMARINE_SERVICE_PASSWORD` = ton nouveau mot de passe
+   - `CANDHIS_KEY` = ta clé de l'API Candhis (facultatif : historique long + secours du tableau public)
 4. **Settings → Pages → Build and deployment → Source : GitHub Actions**.
 5. **Actions → Prévision surf → Run workflow** (première exécution manuelle, ~3 min). Ensuite ça tourne seul toutes les heures.
 6. L'app est en ligne sur `https://<ton-compte>.github.io/super-previ-surf/`.
@@ -87,7 +88,7 @@ Voir `CHANGELOG.md` : 4 passes sur données réelles, chacune avec ses correctio
 
 ### Limites connues
 
-- **Calibration encore jeune** : la page Candhis publique ne donne que 48 h. L'historique se construit à chaque exécution (35 jours glissants) ; la correction de biais deviendra pleinement fiable au bout de 2-3 semaines. Le jeton de l'API Candhis officielle, une fois reçu, permettra de récupérer l'historique long d'un coup (`collector/candhis.py`, fonction à brancher).
+- **Calibration encore jeune** : la page Candhis publique ne donne que 48 h. L'historique se construit à chaque exécution (35 jours glissants) ; la correction de biais deviendra pleinement fiable au bout de 2-3 semaines. Avec la clé de l'API Candhis officielle (secret `CANDHIS_KEY`), les 35 derniers jours de chaque bouée sont chargés d'un coup au premier passage, et l'API prend le relais quand le tableau public ne répond pas (40 requêtes par jour au plus, sur les 150 permises).
 - **Copernicus non testé en conditions réelles** depuis l'environnement de développement (réseau restreint) : le code suit l'API officielle du toolbox v2 et gère les erreurs (identifiant refusé, jeu renommé, variable absente, service en maintenance), mais la première exécution GitHub Actions est le vrai test. Si elle échoue, l'app continue sans Copernicus et le journal de l'action indique pourquoi.
 - **Hauteur au bord** : formule physique générale, non calibrée spot par spot. Le facteur `shelter` de chaque fiche permet de l'ajuster après quelques sessions.
 - **Bouée de Banyuls hors service** depuis le 21/10/2026 : Paulilles et Perafita se calibrent sur Leucate en attendant.
