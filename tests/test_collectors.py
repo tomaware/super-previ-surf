@@ -130,6 +130,9 @@ def test_candhis_api_only_when_public_fails(monkeypatch, tmp_path):
     calls.clear(); longs.clear()
     candhis.main()
     assert calls == ["01101"], "Banyuls vide : pas redemandée avant 12 h"
+    # API pas plus récente que le public : pas redemandée avant 3 h
+    st0 = _json.loads((root / "data" / "history" / "candhis_api.json").read_text())
+    assert st0["vide"]["06601"] > now + 11 * 3600_000
     assert longs == [], "historique pas rechargé"
     st = _json.loads((root / "data" / "history" / "candhis_api.json").read_text())
     assert st["n"] == 6
@@ -137,3 +140,29 @@ def test_candhis_api_only_when_public_fails(monkeypatch, tmp_path):
     calls.clear()
     candhis.main()
     assert calls == [], "sans clé : jamais d'appel API"
+
+
+def test_candhis_api_not_newer_backoff(monkeypatch, tmp_path):
+    import json as _json
+    root = tmp_path
+    (root / "engine").mkdir(); (root / "data" / "history").mkdir(parents=True)
+    (root / "engine" / "spots.json").write_text(_json.dumps({"buoys": [{"code": "01102", "name": "Port-la-Nouvelle"}]}))
+    hist_dir = root / "data" / "history"
+    monkeypatch.setattr(candhis, "ROOT", root)
+    monkeypatch.setattr(candhis.time, "sleep", lambda s: None)
+    now = int(datetime.now(timezone.utc).timestamp() * 1000)
+    old = [{"t": now - 5 * 3600_000, "hs": 2.4, "dir": 198}]   # émet toutes les ~6 h
+    calls = []
+    monkeypatch.setattr(candhis, "fetch_public", lambda code: old)
+    def api(code, key, state, days=1):
+        state["n"] += 1
+        if days > 1:
+            return []
+        calls.append(code)
+        return old
+    monkeypatch.setattr(candhis, "fetch_api", api)
+    monkeypatch.setenv("CANDHIS_KEY", "cle-test")
+    candhis.main(); candhis.main(); candhis.main()
+    assert calls == ["01102"], "une seule requête tant que la bouée n'a rien de neuf (3 h)"
+    st = _json.loads((hist_dir / "candhis_api.json").read_text())
+    assert now + 2.9 * 3600_000 < st["vide"]["01102"] < now + 3.1 * 3600_000

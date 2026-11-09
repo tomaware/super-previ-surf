@@ -217,15 +217,19 @@ def main() -> int:
         except Exception as e:  # réseau, site en maintenance…
             print(f"[candhis] {code}: tableau public en échec ({e})", file=sys.stderr)
         last = obs[-1]["t"] if obs else None
-        # Bouée sans temps réel côté API (ex. Banyuls hors service) : on ne la redemande pas avant 12 h
-        recent_vide = now_ms - state["vide"].get(code, 0) < 12 * 3600_000
+        # Bouée sans temps réel côté API (ex. Banyuls hors service) : pas redemandée avant 12 h ;
+        # API pas plus récente que le tableau public (bouée qui émet toutes les 3-6 h) : pas avant 3 h
+        recent_vide = now_ms < state["vide"].get(code, 0)
         if key and (last is None or now_ms - last > STALE_H * 3600_000) and not recent_vide:
             try:
                 api = fetch_api(code, key, state)
                 if api and (last is None or api[-1]["t"] > last):
                     obs, source = api, "API"
-                elif not api:
-                    state["vide"][code] = now_ms
+                elif api:
+                    state["vide"][code] = now_ms + 3 * 3600_000
+                    print(f"[candhis] {code}: l'API n'a rien de plus récent (nouvel essai dans 3 h)")
+                else:
+                    state["vide"][code] = now_ms + 12 * 3600_000
                     print(f"[candhis] {code}: l'API n'a pas de mesure récente non plus (nouvel essai dans 12 h)")
             except Exception as e:
                 print(f"[candhis] {code}: API en échec ({e})", file=sys.stderr)
