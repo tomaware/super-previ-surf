@@ -70,3 +70,70 @@ def test_copernicus_without_credentials_is_noop(monkeypatch, tmp_path):
     monkeypatch.setattr(sys, "argv", ["copernicus.py", "--out", str(tmp_path / "c.json")])
     assert copernicus.main() == 0
     assert not (tmp_path / "c.json").exists()
+
+
+# ---------------------------------------------------------------- API Candhis (secours)
+# Réponse au format réel de getCampTR (entête + lignes), valeurs relevées le 09/11/2026 à Leucate
+API_SAMPLE = {"success": True, "entete": ["Date", "H1/3 (m)", "Hmax (m)", "Th1/3 (s)", "Dir. au pic (°)", "Etal. au pic (°)", "Temp. mer (°C)"],
+              "results": [["2026-11-09 17:00", "1.7", "3.1", "5.5", "134", "38", "17.8"],
+                          ["2026-11-09 16:30", "99.90", "999.9999", "5.6", "999.9999", "999.9999", "17.8"],
+                          ["2026-11-09 16:00", "1.8", "3.0", "5.6", "131", "35", "17.8"]]}
+
+
+def test_candhis_parse_api_matches_public():
+    obs = candhis.parse_api(API_SAMPLE)
+    assert [o["t"] for o in obs] == sorted(o["t"] for o in obs)
+    last = obs[-1]
+    assert last["t"] == int(datetime(2026, 11, 9, 17, tzinfo=timezone.utc).timestamp() * 1000), "heures en temps universel"
+    assert (last["hs"], last["hmax"], last["tm"], last["dir"], last["spread"], last["sst"]) == (1.7, 3.1, 5.5, 134, 38, 17.8)
+    assert len(obs) == 2, "ligne 16:30 sans hauteur ni direction (99.90 / 999.9999) écartée"
+
+
+def test_candhis_parse_api_hm0_and_extra_column():
+    js = {"entete": ["Date", "Hm0 (m)", "T02 (s)", "Dir. au pic (°)"], "results": [["01101", "2026-11-09 17:00", "1.6", "5.1", "130"]]}
+    o = candhis.parse_api(js)[0]
+    assert (o["hs"], o["tm"], o["dir"]) == (1.6, 5.1, 130), "code campagne en tête de ligne non décrit dans l'entête"
+    assert candhis.parse_api({"success": True, "nbLig": 0}) == []
+
+
+def test_candhis_api_only_when_public_fails(monkeypatch, tmp_path):
+    import json as _json
+    root = tmp_path
+    (root / "engine").mkdir(); (root / "data" / "history").mkdir(parents=True)
+    (root / "engine" / "spots.json").write_text(_json.dumps({"buoys": [{"code": "01101", "name": "Leucate"}, {"code": "03404", "name": "Sète"}, {"code": "06601", "name": "Banyuls"}]}))
+    monkeypatch.setattr(candhis, "ROOT", root)
+    monkeypatch.setattr(candhis.time, "sleep", lambda s: None)
+    now = int(datetime.now(timezone.utc).timestamp() * 1000)
+    fresh = [{"t": now - 1800_000, "hs": 1.0, "dir": 100}]
+    def public(code):
+        if code == "03404":
+            return fresh
+        if code == "01101":
+            raise OSError("site en maintenance")
+        return [{"t": now - 20 * 86400_000, "hs": None, "dir": 200}]   # Banyuls : vieille mesure
+    calls, longs = [], []
+    def api(code, key, state, days=1):
+        state["n"] += 1
+        if days > 1:
+            longs.append(code)
+            return [{"t": now - 30 * 86400_000, "hs": 0.8, "dir": 150}] if code != "06601" else []
+        calls.append(code)
+        return [{"t": now - 600_000, "hs": 1.7, "dir": 134}] if code == "01101" else []
+    monkeypatch.setattr(candhis, "fetch_public", public)
+    monkeypatch.setattr(candhis, "fetch_api", api)
+    monkeypatch.setenv("CANDHIS_KEY", "cle-test")
+    assert candhis.main() == 0
+    hist = _json.loads((root / "data" / "history" / "buoys.json").read_text())
+    assert hist["01101"][-1]["hs"] == 1.7, "Leucate récupérée par l'API"
+    assert longs == ["01101", "03404", "06601"] and hist["03404"][0]["hs"] == 0.8, "historique 35 j chargé une fois"
+    assert calls == ["01101", "06601"], "pas d'appel API pour une bouée à jour"
+    calls.clear(); longs.clear()
+    candhis.main()
+    assert calls == ["01101"], "Banyuls vide : pas redemandée avant 12 h"
+    assert longs == [], "historique pas rechargé"
+    st = _json.loads((root / "data" / "history" / "candhis_api.json").read_text())
+    assert st["n"] == 6
+    monkeypatch.delenv("CANDHIS_KEY")
+    calls.clear()
+    candhis.main()
+    assert calls == [], "sans clé : jamais d'appel API"
