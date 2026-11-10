@@ -103,6 +103,8 @@ jobs:
           cp -r web/* _site/
           cp engine/surf-engine.js engine/spots.json _site/
           cp data/forecast.json _site/data/
+          # extrait Copernicus Med-WAV publié pour OCEAN (données E.U. Copernicus Marine Service, réutilisation libre avec mention)
+          if [ -f data/copernicus.json ]; then cp data/copernicus.json _site/data/; fi
           cp widget/super-previ-surf-widget.js _site/
 
       - uses: actions/upload-pages-artifact@v3
