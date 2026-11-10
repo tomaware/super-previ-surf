@@ -54,6 +54,18 @@ def query_points(spots_doc: dict) -> dict[str, tuple[float, float]]:
     return pts
 
 
+EXTRA = ROOT / "engine" / "copernicus-extra-points.json"
+
+
+def extra_points(path: Path = EXTRA) -> dict[str, tuple[float, float]]:
+    """Points ajoutés à l'extrait pour l'app OCEAN (spots qu'elle seule note) ; sans effet sur cette app,
+    dont le moteur ne lit que ses propres spots. Mêmes points modèles que pour un spot (décalage au large)."""
+    if not path.exists():
+        return {}
+    doc = json.loads(path.read_text())
+    return {k: v for k, v in query_points({"spots": doc.get("spots", [])}).items()}
+
+
 def find_dataset_id(cm) -> str:
     """Retrouve l'identifiant du jeu horaire 'analysis-forecast' dans le catalogue."""
     try:
@@ -133,6 +145,7 @@ def main() -> int:
 
     spots_doc = json.loads((ROOT / "engine" / "spots.json").read_text())
     pts = query_points(spots_doc)
+    pts.update(extra_points())
     lat_min = min(p[0] for p in pts.values()) - 0.15
     lat_max = max(p[0] for p in pts.values()) + 0.15
     lon_min = min(p[1] for p in pts.values()) - 0.15

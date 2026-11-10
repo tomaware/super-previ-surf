@@ -166,3 +166,15 @@ def test_candhis_api_not_newer_backoff(monkeypatch, tmp_path):
     assert calls == ["01102"], "une seule requête tant que la bouée n'a rien de neuf (3 h)"
     st = _json.loads((hist_dir / "candhis_api.json").read_text())
     assert now + 2.9 * 3600_000 < st["vide"]["01102"] < now + 3.1 * 3600_000
+
+
+def test_copernicus_extra_points_for_ocean(tmp_path):
+    f = tmp_path / "x.json"
+    f.write_text('{"spots": [{"id": "saintes-maries", "lat": 43.448, "lon": 4.43, "normal": 175}]}')
+    pts = copernicus.extra_points(f)
+    assert list(pts) == ["saintes-maries"]
+    assert pts["saintes-maries"] == copernicus.offset_point(43.448, 4.43, 175, copernicus.OFFSHORE_KM)
+    assert copernicus.extra_points(tmp_path / "absent.json") == {}
+    # le fichier livré ne touche aucun spot de l'app
+    spots = {s["id"] for s in __import__("json").loads((Path(__file__).resolve().parent.parent / "engine" / "spots.json").read_text())["spots"]}
+    assert not (set(copernicus.extra_points()) & spots)

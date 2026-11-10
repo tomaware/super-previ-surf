@@ -1,0 +1,17 @@
+{
+  "_doc": "Points supplémentaires de l'extrait Copernicus, pour l'app OCEAN (tomaware/ocean, registre des spots, D-22 du 10/11/2026). Ignorés par le moteur de cette app. Mêmes champs que engine/spots.json (lat, lon, normal) : le point modèle est décalé au large comme pour un spot.",
+  "spots": [
+    {
+      "id": "saintes-maries",
+      "lat": 43.448,
+      "lon": 4.43,
+      "normal": 175
+    },
+    {
+      "id": "la-couronne",
+      "lat": 43.331,
+      "lon": 5.055,
+      "normal": 165
+    }
+  ]
+}
